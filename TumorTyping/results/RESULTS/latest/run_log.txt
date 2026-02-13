@@ -1,0 +1,9 @@
+[2026-02-12 10:44:42] Deep baseline debug run
+Data: simulated beta matrix in [0,1], class-specific disjoint probe sets
+Shape: X=(600, 8000), classes=4
+Split: train=450 test=150 (stratified)
+Baseline A (no PCA): bal_acc=1.0000, macro_f1=1.0000
+Baseline B (PCA->SVM, k=200): bal_acc=1.0000, macro_f1=1.0000
+Saved: D:/Study Material/LifeReset/Signals/MEG/results/latest/confusion_matrix_no_pca.png
+Saved: D:/Study Material/LifeReset/Signals/MEG/results/latest/confusion_matrix_pca.png
+Saved: D:/Study Material/LifeReset/Signals/MEG/results/latest/pca_explained_variance.png

@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-02-12 10:44:42",
+  "project_root": "D:/Study Material/LifeReset/Signals/MEG",
+  "outdir": "D:/Study Material/LifeReset/Signals/MEG/results/latest",
+  "config": {
+    "n_samples": 600,
+    "n_features": 8000,
+    "n_classes": 4,
+    "n_inform_per_class": 250,
+    "shift": 0.3,
+    "seed": 42,
+    "svm_C": 1.0,
+    "pca_components": 200
+  },
+  "baseline_no_pca": {
+    "balanced_accuracy": 1.0,
+    "macro_f1": 1.0
+  },
+  "baseline_pca": {
+    "balanced_accuracy": 1.0,
+    "macro_f1": 1.0
+  },
+  "informative_probes": {
+    "total": 1000,
+    "per_class": 250
+  },
+  "plots": {
+    "cm_no_pca": "D:/Study Material/LifeReset/Signals/MEG/results/latest/confusion_matrix_no_pca.png",
+    "cm_pca": "D:/Study Material/LifeReset/Signals/MEG/results/latest/confusion_matrix_pca.png",
+    "pca_explained_variance": "D:/Study Material/LifeReset/Signals/MEG/results/latest/pca_explained_variance.png"
+  }
+}
