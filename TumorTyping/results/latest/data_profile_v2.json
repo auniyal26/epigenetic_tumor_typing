@@ -1,0 +1,55 @@
+{
+  "timestamp": "2026-02-24 09:18:25",
+  "n_samples": 2801,
+  "n_classes": 91,
+  "rare_counts": {
+    "lt5": 0,
+    "lt10": 15,
+    "lt20": 41
+  },
+  "top15": {
+    "GBM, RTK II": 143,
+    "MB, G4": 138,
+    "LGG, PA PF": 114,
+    "EPN, PF A": 91,
+    "MNG": 90,
+    "MB, SHH CHL AD": 84,
+    "O IDH": 80,
+    "DMG, K27": 78,
+    "A IDH": 78,
+    "MB, G3": 77,
+    "EPN, RELA": 70,
+    "GBM, RTK I": 64,
+    "GBM, MES": 56,
+    "MB, SHH INF": 52,
+    "EPN, PF B": 51
+  },
+  "characteristics_scan": [
+    {
+      "row_idx": 0,
+      "key_guess": "methylation class",
+      "n_unique": 91,
+      "examples": [
+        "GBM, G34",
+        "DMG, K27",
+        "ATRT, SHH",
+        "CONTR, CEBM",
+        "GBM, MYCN"
+      ]
+    },
+    {
+      "row_idx": 1,
+      "key_guess": "material",
+      "n_unique": 2,
+      "examples": [
+        "Frozen",
+        "FFPE"
+      ]
+    }
+  ],
+  "artifacts": {
+    "md": "D:/Study Material/LifeReset/Epigenetics/TumorTyping/results/latest/data_profile_v2.md",
+    "plot": "D:/Study Material/LifeReset/Epigenetics/TumorTyping/results/latest/class_counts_top30.png",
+    "json": "D:/Study Material/LifeReset/Epigenetics/TumorTyping/results/latest/data_profile_v2.json"
+  }
+}
