@@ -1,0 +1,185 @@
+{
+  "timestamp": "2026-02-26 20:06:06",
+  "config": {
+    "series_matrix_path": "D:\\Study Material\\LifeReset\\Epigenetics\\TumorTyping\\Data\\GSE90496_series_matrix.txt.gz",
+    "beta_matrix_path": "D:\\Study Material\\LifeReset\\Epigenetics\\TumorTyping\\Data\\GSE90496_beta.txt.gz",
+    "out_dir": "D:\\Study Material\\LifeReset\\Epigenetics\\TumorTyping\\results\\latest",
+    "chunksize": 20000,
+    "pass1_sample_subsample": 150,
+    "pass1_max_probes": 80000,
+    "top_k_by_variance": 2000,
+    "min_class_support": 20,
+    "other_label": "OTHER",
+    "test_size": 0.25,
+    "seed": 42,
+    "svm_C": 1.0,
+    "svm_max_iter": 20000,
+    "lr_C": 1.0,
+    "lr_max_iter": 2000
+  },
+  "label_stats": {
+    "n_classes_raw": 91,
+    "n_classes_kept": 50,
+    "n_classes_after": 51,
+    "n_other": 498
+  },
+  "n_samples": 2801,
+  "n_features": 2000,
+  "model_results": {
+    "LinearSVC": {
+      "balanced_acc": 0.9545535661573487,
+      "macro_f1": 0.9506509950906143
+    },
+    "LogReg_saga": {
+      "balanced_acc": 0.975143502467032,
+      "macro_f1": 0.968834291104915
+    }
+  },
+  "best_model": "LogReg(saga)",
+  "top_confusions": [
+    [
+      "LGG, PA/GG ST",
+      "CONTR, REACT",
+      0.3333333333333333
+    ],
+    [
+      "GBM, MES",
+      "GBM, RTK II",
+      0.2857142857142857
+    ],
+    [
+      "GBM, RTK I",
+      "GBM, RTK II",
+      0.1875
+    ],
+    [
+      "LGG, DNT",
+      "LGG, PA/GG ST",
+      0.09090909090909091
+    ],
+    [
+      "A IDH, HG",
+      "A IDH",
+      0.08333333333333333
+    ],
+    [
+      "MB, SHH INF",
+      "MB, SHH CHL AD",
+      0.07692307692307693
+    ],
+    [
+      "O IDH",
+      "A IDH",
+      0.05
+    ],
+    [
+      "MB, SHH CHL AD",
+      "MB, SHH INF",
+      0.047619047619047616
+    ],
+    [
+      "MB, G4",
+      "MB, G3",
+      0.02857142857142857
+    ],
+    [
+      "GBM, RTK II",
+      "GBM, MES",
+      0.027777777777777776
+    ],
+    [
+      "OTHER",
+      "A IDH, HG",
+      0.008
+    ],
+    [
+      "OTHER",
+      "CONTR, REACT",
+      0.008
+    ],
+    [
+      "OTHER",
+      "DMG, K27",
+      0.008
+    ],
+    [
+      "OTHER",
+      "GBM, RTK I",
+      0.008
+    ],
+    [
+      "OTHER",
+      "LGG, GG",
+      0.008
+    ]
+  ],
+  "worst_recall": [
+    [
+      "LGG, PA/GG ST",
+      0.6666666666666666
+    ],
+    [
+      "GBM, MES",
+      0.7142857142857143
+    ],
+    [
+      "GBM, RTK I",
+      0.8125
+    ],
+    [
+      "LGG, DNT",
+      0.9090909090909091
+    ],
+    [
+      "A IDH, HG",
+      0.9166666666666666
+    ],
+    [
+      "MB, SHH INF",
+      0.9230769230769231
+    ],
+    [
+      "OTHER",
+      0.944
+    ],
+    [
+      "O IDH",
+      0.95
+    ],
+    [
+      "MB, SHH CHL AD",
+      0.9523809523809523
+    ],
+    [
+      "MB, G4",
+      0.9714285714285714
+    ],
+    [
+      "GBM, RTK II",
+      0.9722222222222222
+    ],
+    [
+      "A IDH",
+      1.0
+    ],
+    [
+      "ANA PA",
+      1.0
+    ],
+    [
+      "ATRT, MYC",
+      1.0
+    ],
+    [
+      "ATRT, SHH",
+      1.0
+    ]
+  ],
+  "artifacts": {
+    "results_table": "D:/Study Material/LifeReset/Epigenetics/TumorTyping/results/latest/results_table_v2.md",
+    "cm_raw": "D:/Study Material/LifeReset/Epigenetics/TumorTyping/results/latest/confusion_matrix_raw.png",
+    "cm_norm": "D:/Study Material/LifeReset/Epigenetics/TumorTyping/results/latest/confusion_matrix_norm.png",
+    "run_log": "D:/Study Material/LifeReset/Epigenetics/TumorTyping/results/latest/run_log_v2.txt"
+  },
+  "runtime_sec": 2647.7543065547943
+}

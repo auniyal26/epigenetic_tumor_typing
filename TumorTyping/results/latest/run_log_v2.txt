@@ -1,0 +1,10 @@
+[2026-02-26 20:06:06] Baseline v2 on GSE90496 (real beta values)
+Pass1: subsample=150, max_probes=80000, top_k=2000, chunksize=20000
+Features used: 2000 probes
+Label policy: min_support=20, OTHER=498 samples, classes_after=51
+Split: train/val = 0.75/0.25 stratified (seed=42)
+Model A: LinearSVC bal_acc=0.9546 macro_f1=0.9507
+Model B: LogReg(saga) bal_acc=0.9751 macro_f1=0.9688
+Best: LogReg(saga) (by macro_f1)
+Saved: results_table_v2.md + confusion_matrix_raw/norm.png + metrics_v2.json
+Runtime: 2647.7s
