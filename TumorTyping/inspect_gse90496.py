@@ -37,7 +37,7 @@ def parse_series_rows(series_path: Path):
                 rows["title"] = [x.strip().strip('"') for x in line.strip().split("\t")[1:]]
             elif line.startswith("!Sample_characteristics_ch1"):
                 vals = [x.strip().strip('"') for x in line.strip().split("\t")[1:]]
-                # store the row; later we’ll decide what it is
+                # store the row;
                 rows["characteristics_rows"].append(vals)
                 # capture methylation class row
                 if vals and vals[0].lower().startswith("methylation class:"):
@@ -98,7 +98,6 @@ def main():
 
     # ---- batch-ish fields discovery ----
     # characteristics rows are lists of strings like "key: value"
-    # We’ll look at the first element of each row to see what kind of field it is.
     char_rows = rows["characteristics_rows"]
     row_summaries = []
     for i, vals in enumerate(char_rows[:12]):
