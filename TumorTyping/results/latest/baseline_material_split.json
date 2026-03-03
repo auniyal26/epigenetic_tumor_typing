@@ -1,0 +1,72 @@
+{
+  "timestamp": "2026-03-03 09:32:53",
+  "config": {
+    "series_matrix_path": "D:\\Study Material\\LifeReset\\Epigenetics\\TumorTyping\\Data\\GSE90496_series_matrix.txt.gz",
+    "beta_matrix_path": "D:\\Study Material\\LifeReset\\Epigenetics\\TumorTyping\\Data\\GSE90496_beta.txt.gz",
+    "out_dir": "D:\\Study Material\\LifeReset\\Epigenetics\\TumorTyping\\results\\latest",
+    "chunksize": 20000,
+    "pass1_sample_subsample": 150,
+    "pass1_max_probes": 80000,
+    "top_k_by_variance": 2000,
+    "min_class_support": 20,
+    "other_label": "OTHER",
+    "test_size": 0.25,
+    "seed": 42,
+    "lr_C": 1.0,
+    "lr_max_iter": 2000,
+    "material_key": "material",
+    "allowed_materials": [
+      "Frozen",
+      "FFPE"
+    ]
+  },
+  "material_counts": {
+    "FFPE": 1878,
+    "Frozen": 923
+  },
+  "subset_results": {
+    "Frozen": {
+      "n_samples": 923,
+      "n_features": 2000,
+      "label_stats": {
+        "n_classes_raw": 57,
+        "n_classes_kept": 19,
+        "n_classes_after": 20,
+        "n_other": 228
+      },
+      "metrics": {
+        "balanced_acc": 0.9453205931495405,
+        "macro_f1": 0.9452519721637369,
+        "n_train": 692,
+        "n_val": 231,
+        "n_features": 2000,
+        "n_classes": 20
+      }
+    },
+    "FFPE": {
+      "n_samples": 1878,
+      "n_features": 2000,
+      "label_stats": {
+        "n_classes_raw": 90,
+        "n_classes_kept": 38,
+        "n_classes_after": 39,
+        "n_other": 595
+      },
+      "metrics": {
+        "balanced_acc": 0.9604270884472226,
+        "macro_f1": 0.9460204395022527,
+        "n_train": 1408,
+        "n_val": 470,
+        "n_features": 2000,
+        "n_classes": 39
+      }
+    }
+  },
+  "artifacts": {
+    "material_counts_md": "D:/Study Material/LifeReset/Epigenetics/TumorTyping/results/latest/material_counts.md",
+    "material_vs_label_top20_png": "D:/Study Material/LifeReset/Epigenetics/TumorTyping/results/latest/material_vs_label_top20.png",
+    "baseline_material_split_json": "D:/Study Material/LifeReset/Epigenetics/TumorTyping/results/latest/baseline_material_split.json",
+    "run_log": "D:/Study Material/LifeReset/Epigenetics/TumorTyping/results/latest/run_log_material.txt"
+  },
+  "runtime_sec": 2031.966413974762
+}

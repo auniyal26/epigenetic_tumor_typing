@@ -1,0 +1,7 @@
+[2026-03-03 09:32:53] Material confound check (GSE90496)
+Material counts: {'FFPE': 1878, 'Frozen': 923}
+Settings: topk=2000, pass1_subsample=150, pass1_max_probes=80000, min_support=20
+Frozen: bal_acc=0.9453, macro_f1=0.9453, n=923
+FFPE:   bal_acc=0.9604, macro_f1=0.9460, n=1878
+Interpretation: if macro_f1 differs by >0.03–0.05, Material is likely a real confound; otherwise lower risk.
+Runtime: 2032.0s
