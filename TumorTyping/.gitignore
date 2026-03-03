@@ -1,0 +1,23 @@
+# data + outputs
+Data/
+results/
+
+# python junk
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# env
+.venv/
+venv/
+.env
+
+# notebooks
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+_quarantine/
+
