@@ -1,3 +1,5 @@
+> Repo overview: see `../README.md`
+
 # TumorTyping — GSE90496 Methylation Baselines
 
 Minimal, runnable tumor-typing baselines using GSE90496 methylation beta values.
