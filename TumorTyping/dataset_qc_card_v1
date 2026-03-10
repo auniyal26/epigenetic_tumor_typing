@@ -1,0 +1,247 @@
+from __future__ import annotations
+
+import re
+import json
+from dataclasses import dataclass, asdict
+from datetime import datetime
+from pathlib import Path
+from typing import List, Tuple
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+BASE = Path(__file__).resolve().parent
+DATA = BASE / "Data"
+OUT = BASE / "results" / "latest"
+OUT.mkdir(parents=True, exist_ok=True)
+
+
+@dataclass
+class Config:
+    series_matrix_path: str = str(DATA / "GSE90496_series_matrix.txt.gz")
+    beta_matrix_path: str = str(DATA / "GSE90496_beta.txt.gz")
+
+    # Card settings
+    topN_classes: int = 30
+    min_support: int = 20
+    other_label: str = "OTHER"
+
+    # Split summary (policy text only; not actually splitting today)
+    split_train_frac: float = 0.75
+    split_val_frac: float = 0.25
+    seed: int = 42
+    stratified: bool = True
+
+    # QC subsample for histogram
+    qc_nrows_probes: int = 5000         # number of probes (rows) to read
+    qc_ncols_samples: int = 200         # number of SAMPLE columns to read
+    qc_random_seed: int = 42
+
+
+def parse_series_matrix(series_path: str) -> Tuple[pd.Series, pd.Series]:
+    """
+    Returns:
+      y: methylation class labels (length 2801, in sample order)
+      material: Frozen/FFPE if present (length 2801, in sample order; may be NaN if missing)
+    """
+    y = None
+    material = None
+
+    with pd.io.common.get_handle(series_path, "r", compression="infer") as h:
+        for line in h.handle:
+            if line.startswith("!Sample_characteristics_ch1"):
+                vals = [x.strip().strip('"') for x in line.strip().split("\t")[1:]]
+                if not vals:
+                    continue
+                key = vals[0].split(":", 1)[0].strip().lower() if ":" in vals[0] else ""
+                if key == "methylation class":
+                    y = pd.Series([v.split(":", 1)[1].strip() for v in vals], name="methylation_class")
+                if key == "material":
+                    material = pd.Series([v.split(":", 1)[1].strip() for v in vals], name="material")
+            if y is not None and material is not None:
+                break
+
+    if y is None:
+        raise RuntimeError("Could not find 'methylation class' in series matrix.")
+    if material is None:
+        # material may not exist in some GEO matrices; keep empty series
+        material = pd.Series([None] * len(y), name="material")
+
+    return y, material
+
+
+def get_sample_columns(beta_path: str) -> List[str]:
+    hdr = pd.read_csv(beta_path, sep="\t", compression="infer", nrows=0)
+    cols = hdr.columns.tolist()
+    sample_cols = [c for c in cols if str(c).upper().startswith("SAMPLE ")]
+    if not sample_cols:
+        raise RuntimeError("No SAMPLE columns found in beta file header.")
+    return sample_cols
+
+
+def group_rare(y: pd.Series, min_support: int, other: str):
+    counts = y.value_counts()
+    keep = set(counts[counts >= min_support].index)
+    y2 = y.where(y.isin(keep), other)
+    stats = {
+        "n_samples": int(len(y)),
+        "n_classes_raw": int(counts.shape[0]),
+        "n_classes_kept": int(len(keep)),
+        "n_classes_after": int(y2.nunique()),
+        "n_other": int((y2 == other).sum()),
+        "classes_lt10": int((counts < 10).sum()),
+        "classes_lt20": int((counts < 20).sum()),
+    }
+    return y2, counts, stats
+
+
+def plot_top_class_counts(counts: pd.Series, topN: int, outpath: Path):
+    top = counts.head(topN).iloc[::-1]
+    fig, ax = plt.subplots(figsize=(10, 10))
+    ax.barh(top.index, top.values)
+    ax.set_title(f"GSE90496 methylation class counts — top {topN}")
+    ax.set_xlabel("samples")
+    fig.tight_layout()
+    fig.savefig(outpath, dpi=220)
+    plt.close(fig)
+
+
+def plot_beta_histogram(beta_path: str, sample_cols: List[str], nrows: int, ncols: int, seed: int, outpath: Path):
+    """
+    QC plot: histogram of beta values from a small subsample.
+    Reads only SAMPLE columns (ignores detection pvals).
+    """
+    rng = np.random.default_rng(seed)
+    if ncols < len(sample_cols):
+        chosen = list(rng.choice(sample_cols, size=ncols, replace=False))
+    else:
+        chosen = sample_cols
+
+    usecols = ["ID_REF"] + chosen
+
+    df = pd.read_csv(
+        beta_path,
+        sep="\t",
+        compression="infer",
+        usecols=usecols,
+        nrows=nrows,
+        low_memory=False,
+    )
+
+    X = df.drop(columns=["ID_REF"]).apply(pd.to_numeric, errors="coerce").to_numpy(dtype=np.float32)
+    vals = X.reshape(-1)
+    vals = vals[np.isfinite(vals)]
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    ax.hist(vals, bins=60)
+    ax.set_title(f"Beta value distribution QC (nrows={nrows}, ncols={len(chosen)})")
+    ax.set_xlabel("beta value")
+    ax.set_ylabel("count")
+    ax.set_xlim(0, 1)
+    fig.tight_layout()
+    fig.savefig(outpath, dpi=220)
+    plt.close(fig)
+
+    return {
+        "qc_vals_count": int(vals.size),
+        "qc_min": float(np.min(vals)) if vals.size else None,
+        "qc_max": float(np.max(vals)) if vals.size else None,
+        "qc_mean": float(np.mean(vals)) if vals.size else None,
+    }
+
+
+def main():
+    cfg = Config()
+    ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    y, material = parse_series_matrix(cfg.series_matrix_path)
+    y_grouped, counts, stats = group_rare(y, cfg.min_support, cfg.other_label)
+
+    # class count plot
+    class_plot = OUT / "class_counts_top30_v1.png"
+    plot_top_class_counts(counts, cfg.topN_classes, class_plot)
+
+    # QC beta histogram
+    sample_cols = get_sample_columns(cfg.beta_matrix_path)
+    qc_plot = OUT / "qc_beta_hist_v1.png"
+    qc_stats = plot_beta_histogram(
+        cfg.beta_matrix_path,
+        sample_cols,
+        nrows=cfg.qc_nrows_probes,
+        ncols=cfg.qc_ncols_samples,
+        seed=cfg.qc_random_seed,
+        outpath=qc_plot,
+    )
+
+    # material counts (batch-ish)
+    mat_counts = material.value_counts(dropna=True).to_dict()
+
+    # Write markdown card
+    md_path = OUT / "dataset_qc_card_v1.md"
+    md = []
+    md += ["# Dataset/QC Card v1 — GSE90496", ""]
+    md += [f"- Timestamp: {ts}"]
+    md += [f"- Series matrix: `{Path(cfg.series_matrix_path).name}`"]
+    md += [f"- Beta file: `{Path(cfg.beta_matrix_path).name}`"]
+    md += [""]
+
+    md += ["## Dataset summary", ""]
+    md += [f"- Samples: **{stats['n_samples']}**"]
+    md += [f"- Classes (raw): **{stats['n_classes_raw']}**"]
+    md += [f"- Rare classes: <10 samples = **{stats['classes_lt10']}**, <20 samples = **{stats['classes_lt20']}**"]
+    md += [""]
+
+    md += ["## Label policy (recommended for baselines)", ""]
+    md += [f"- Group classes with support < **{cfg.min_support}** into **{cfg.other_label}**"]
+    md += [f"- Resulting classes: **{stats['n_classes_after']}** (kept={stats['n_classes_kept']}, OTHER={stats['n_other']} samples)"]
+    md += [""]
+
+    md += ["## Split summary (policy)", ""]
+    md += [f"- Train/val: **{cfg.split_train_frac:.2f}/{cfg.split_val_frac:.2f}**"]
+    md += [f"- Stratified: **{cfg.stratified}**"]
+    md += [f"- Seed: **{cfg.seed}**"]
+    md += [""]
+
+    md += ["## Batch/metadata (from Series Matrix)", ""]
+    if mat_counts:
+        md += [f"- Material counts (potential confound): `{mat_counts}`"]
+    else:
+        md += ["- Material field not found or empty."]
+    md += [""]
+
+    md += ["## Class counts", ""]
+    md += [f"- Top-{cfg.topN_classes} plot: `{class_plot.as_posix()}`", ""]
+    md += ["## QC plot", ""]
+    md += [f"- Beta histogram (subsample): `{qc_plot.as_posix()}`"]
+    md += [f"- QC stats: min={qc_stats['qc_min']:.4f}, max={qc_stats['qc_max']:.4f}, mean={qc_stats['qc_mean']:.4f}, n_vals={qc_stats['qc_vals_count']}"]
+    md += [""]
+
+    md_path.write_text("\n".join(md) + "\n", encoding="utf-8")
+
+    # JSON companion
+    json_path = OUT / "dataset_qc_card_v1.json"
+    payload = {
+        "timestamp": ts,
+        "config": asdict(cfg),
+        "stats": stats,
+        "material_counts": mat_counts,
+        "qc_stats": qc_stats,
+        "artifacts": {
+            "md": md_path.as_posix(),
+            "json": json_path.as_posix(),
+            "class_plot": class_plot.as_posix(),
+            "qc_plot": qc_plot.as_posix(),
+        },
+    }
+    json_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+    print("Wrote:", md_path)
+    print("Wrote:", class_plot)
+    print("Wrote:", qc_plot)
+    print("Wrote:", json_path)
+
+
+if __name__ == "__main__":
+    main()
